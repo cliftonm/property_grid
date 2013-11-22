@@ -102,7 +102,64 @@ This is an example of the SASS that is used in the [demo](https://github.com/cli
         background-color: #e0e0ff
 ```
 
-##
+## Model, View and Controller
+
+See the article [here](http://www.codeproject.com/Articles/685326/A-PropertyGrid-implemented-in-Ruby-on-Rails) for
+how to create your model, view, and controller.
+
+### A Basic Model
+
+This is the model I used in the demo:
+
+```
+# A class that behaves like an ActiveRecord, so we can use it in form_for, but isn't actually persisted.
+class NonPersistedActiveRecord
+  include ActiveModel::Validations
+  include ActiveModel::Conversion
+  extend ActiveModel::Naming
+
+  # Required by ActiveModel::Naming to tell it we're not persisting the model.
+  def persisted?
+    false
+  end
+end
+
+class PropertyGridRecord < NonPersistedActiveRecord
+  attr_accessor :prop_a
+  attr_accessor :prop_b
+  attr_accessor :prop_c
+  attr_accessor :prop_d
+  attr_accessor :prop_e
+  attr_accessor :prop_f
+  attr_accessor :prop_g
+  attr_accessor :prop_h
+  attr_accessor :prop_i
+  attr_accessor :records
+
+  def initialize
+    @records =
+        [
+            ARecord.new(1, 'California'),
+            ARecord.new(2, 'New York'),
+            ARecord.new(3, 'Rhode Island'),
+        ]
+
+    @prop_a = 'Hello World'
+    @prop_b = 'Password!'
+    @prop_c = '08/19/1962'
+    @prop_d = '12:32 pm'
+    @prop_e = '08/19/1962 12:32 pm'
+    @prop_f = true
+    @prop_g = '#ff0000'
+    @prop_h = 'Pears'
+    @prop_i = 2
+  end
+end
+```
+You'll note in this particular case I'm spoofing using an ActiveRecord -- you can of course
+use ActiveRecord models as well.
+
+### A Basic View
 
 This is the basic structure of the markup in Slim syntax.
 
@@ -134,7 +191,45 @@ This is the basic structure of the markup in Slim syntax.
       $(".jq_colorPicker").minicolors()
 ```
 
-## Model, View and Controller
+### A Basic Controller
 
-See the article [here](http://www.codeproject.com/Articles/685326/A-PropertyGrid-implemented-in-Ruby-on-Rails) for
-how to create your model, view, and controller.
+Here's an example of how the controller puts it all together.  You'll see this code in the demo as well.
+
+```
+include PropertyGrid
+
+class DemoPageController < ApplicationController
+  def index
+    initialize_attributes
+  end
+
+  private
+
+  def initialize_attributes
+    @property_grid_record = PropertyGridRecord.new
+    @property_grid = define_property_grid
+    @javascript = generate_javascript_for_property_groups(@property_grid)
+  end
+
+  def define_property_grid
+    grid = new_property_grid
+    group 'Text Input'
+    group_property 'Text', :prop_a
+    group_property 'Password', :prop_b, :password
+    group 'Date and Time Pickers'
+    group_property 'Date', :prop_c, :date
+    group_property 'Time', :prop_d, :date
+    group_property 'Date/Time', :prop_e, :datetime
+    group 'State'
+    group_property 'Boolean', :prop_f, :boolean
+    group 'Miscellaneous'
+    group_property 'Color', :prop_g, :color
+    group 'Lists'
+    group_property 'Basic List', :prop_h, :list, ['Apples', 'Oranges', 'Pears']
+    group_property 'ID - Name List', :prop_i, :db_list, @property_grid_record.records
+
+    grid
+  end
+end
+```
+

@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = PropertyGrid::VERSION
   spec.authors       = ["Marc Clifton"]
   spec.email         = ["marc.clifton@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
+  spec.description   = %q{A dynamic runtime property grid control.}
+  spec.summary       = %q{A dynamic runtime property grid control.}
+  spec.homepage      = "https://github.com/cliftonm/property_grid"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
